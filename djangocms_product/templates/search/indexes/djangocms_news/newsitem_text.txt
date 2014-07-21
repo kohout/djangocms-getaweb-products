@@ -1,0 +1,6 @@
+{{ object.title }}
+{{ object.abstract }}
+{{ object.content|safe }}
+{% for category in objects.news_categories %}
+  {{ category.title }}
+{% endfor %}

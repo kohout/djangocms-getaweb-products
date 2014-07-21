@@ -1,4 +1,4 @@
-djangocms-getaweb-products
-==========================
+djangocms-getaweb-news
+======================
 
-Simple presentation of products
+A news system for Django CMS 3.0

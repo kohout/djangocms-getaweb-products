@@ -1,0 +1,30 @@
+{% load i18n %}
+<section class="news-teaser">
+<h2>{{ instance.title }}</h2>
+{% if items %}
+<ul>
+    {% for item in items %}
+        <li>
+            {% with first_image=item.get_first_image %}
+                {% if first_image %}
+                    {% with i=first_image.get_teaser %}
+                    <img src="{{ i.url }}"
+                         width="{{ i.width }}"
+                         height="{{ i.height }}"
+                         alt="{{ i.alt }}"
+                         {% if i.title %}
+                           title="{{ i.title }}"
+                         {% endif %}>
+                    {% endwith %}
+                {% endif %}
+            {% endwith %}
+            <div>{{ item.news_date|date:"d.m.Y" }}</div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.abstract }}</p>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+    <p>{% trans "There are no news items available." %}</p>
+{% endif %}
+</section>
