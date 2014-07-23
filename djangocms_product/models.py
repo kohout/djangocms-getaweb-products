@@ -1,7 +1,6 @@
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.pagemodel import Page
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -83,12 +82,9 @@ class ProductItem(models.Model):
         blank=True, null=True,
         verbose_name=_(u'Selected product categories'))
 
-    sites = models.ManyToManyField(
-        Site,
+    target_page = models.ManyToManyField(
+        Page,
         blank=True, null=True,
-        verbose_name=_(u'Websites'))
-
-    target_page = models.ForeignKey(Page,
         verbose_name=_(u'Target Page'))
 
     document = models.FileField(
