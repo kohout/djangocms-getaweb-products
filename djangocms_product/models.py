@@ -18,13 +18,19 @@ class ProductCategory(models.Model):
         max_length=150,
         verbose_name=_(u'Title'))
 
+    slug = models.SlugField(
+        max_length=255,
+        db_index=True,
+        unique=True,
+        verbose_name=_("slug"))
+
     def productitems_count(self):
         return self.productitem_set.filter(active=True).count()
 
     productitems_count.short_description = _(u'Count of active product items')
 
     def get_absolute_url(self):
-        return reverse('product-detail', kwargs={'category': self.pk})
+        return reverse('product-detail', kwargs={'category': self.slug})
 
     def __unicode__(self):
         return self.title
@@ -79,7 +85,6 @@ class ProductItem(models.Model):
 
     sites = models.ManyToManyField(
         Site,
-        default=Site.objects.all(),
         blank=True, null=True,
         verbose_name=_(u'Websites'))
 
@@ -110,8 +115,12 @@ class ProductItem(models.Model):
         return self.productimage_set.count() > 1
 
     def get_absolute_url(self):
-        view_name = '%s:product-detail' % self.target_page.application_namespace
+        view_name = '%s:product-detail' % (
+            self.target_page.application_namespace, )
         return reverse(view_name, kwargs={'slug': self.slug})
+
+    def __unicode__(self):
+        return self.title
 
     class Meta:
         ordering = ('-changed_at', )
@@ -200,10 +209,10 @@ class ProductImage(models.Model):
             return self.alt
         return u'Bild %s' % (self.ordering + 1)
 
-    #def save(self):
-    #    if self.ordering is None:
-    #        self.ordering = self.product_item.productimage_set.count()
-    #    super(ProductImage, self).save()
+    def save(self, *args, **kwargs):
+        if self.ordering is None:
+            self.ordering = self.product_item.productimage_set.count()
+        super(ProductImage, self).save(*args, **kwargs)
 
     def _get_image(self, image_format):
         _image_format = settings.THUMBNAIL_ALIASES[''][image_format]

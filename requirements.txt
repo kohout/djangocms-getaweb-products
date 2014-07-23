@@ -1,0 +1,1 @@
+pip install -e git+https://github.com/jrief/django-admin-sortable2#egg=django-admin-sortable2
