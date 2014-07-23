@@ -45,7 +45,7 @@ class ProductItemAdmin(admin.ModelAdmin):
             'fields': (
                 ('active', ),
                 ('price', 'special_offer', ),
-                ('sites', 'product_categories', 'target_page'),
+                ('product_categories', 'target_page'),
             )
         }),
         (_(u'Content'), {
