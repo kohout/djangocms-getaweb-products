@@ -1,5 +1,48 @@
-<ul>
-{% for item in items %}
-    <li>News Item 1</li>
-{% endfor %}
-</ul>
+{% extends "layouts/sidebar_left.html" %}
+{% load cms_tags sekizai_tags thumbnail cmsproducts %}
+
+{% block sidebar %}
+    {% include "djangocms_product/product_filter.html" with filter_tag='product' %}
+{% endblock %}
+
+{% block content %}
+    {% addtoblock "css" %}
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/masonry.css">
+    {% endaddtoblock %}
+
+    {% addtoblock "js" %}
+        <script src="{{ STATIC_URL }}js/imagesloaded.pkgd.min.js"></script>
+        <script src="{{ STATIC_URL }}js/masonry.pkgd.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.history.js"></script>
+    {% endaddtoblock %}
+
+    <h1>Unsere Produkte</h1>
+    <div id="masonry-loader">
+        <i class="fa fa-spinner fa-spin fa-5x"></i>
+    </div>
+    <div id="masonry-container">
+    </div>
+    <div id="masonry-no-content">
+        <i class="fa fa-meh-o fa-5x fa-fw"></i> <span>Keine Inhalte gefunden!</span>
+    </div>
+
+    <!-- Modal Item -->
+    <div class="modal" id="modal-window" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-center modal-lg">
+            <div id="modal-loader">
+                <i class="fa fa-spinner fa-spin fa-5x"></i>
+            </div>
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h1 class="modal-title" id="modal-label"></h1>
+                </div>
+                <div id="modal-body" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

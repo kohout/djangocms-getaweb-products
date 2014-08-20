@@ -29,8 +29,8 @@ def more_images(news_item, image_format):
     return [n._get_image(image_format) for n in images.all()]
 
 @register.simple_tag(takes_context=True)
-def newsindex_url(context):
-    return reverse(context['request'], 'news-index')
+def productindex_url(context, prefix=None, app_name=None,):
+    return reverse(context['request'], prefix, app_name, 'product-index')
 
 @register.simple_tag(takes_context=True)
 def newsitem_url(context, slug):
