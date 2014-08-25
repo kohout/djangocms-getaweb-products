@@ -6,26 +6,33 @@ from .models import ProductItem, ProductCategory
 
 class ProductMixin(object):
     current_category = 0
+    current_page = None
+
+    def get_current_page(self):
+        if self.current_page:
+            return self.current_page
+        self.current_page = self.request.current_page
+        if self.current_page.publisher_is_draft:
+            self.current_page = self.current_page.publisher_public
+        return self.current_page
 
     def get_queryset(self):
         q = ProductItem.objects.filter(active=True)
-        if self.request.user.is_staff or self.request.user.is_superuser:
-            # regard public and private version
-            q = q.filter(
-                Q(target_page=self.request.current_page) |
-                Q(target_page=self.request.current_page.publisher_public))
-        else:
-            # regard only public version
-            q = q.filter(target_page=self.request.current_page)
+        q = q.filter(target_page=self.get_current_page())
 
-        self.current_category = int(self.kwargs.get('category', 0))
-        if self.current_category > 0:
-            q = q.filter(product_categories__in=[self.current_category])
+        # TODO: does not work -> frontend renders strange urls:
+        # http://localhost:8000/shop/category/5/?/shop/category/5/=/shop/category/5/
+        # The news module seems to be a newer version which works:
+        # /news/?category=5,4,3,2,....
+        #self.current_category = int(self.kwargs.get('category', 0))
+        #if self.current_category > 0:
+        #    q = q.filter(product_categories__in=[self.current_category])
+        print q.query
         return q
 
     def get_product_categories(self):
         product_categories = ProductCategory.objects.filter(
-            productitem__target_page=self.request.current_page
+            productitem__target_page=self.get_current_page()
         ).distinct().order_by('title')
         return [{
             'item': n,
