@@ -22,26 +22,21 @@
     </div>
     <div id="masonry-container">
         {% for product in object_list %}
-            <div class="masonry-item one-third{% for cat in product.product_categories.all %} news-{{ cat.pk }}{% endfor %}">
+            <div class="masonry-item one-third">
                 <div class="masonry-item-image">
                     <a href="{% productitem_url product.slug %}">
-                        {% if product.productimage_set.all %}
-                            {% with product.productimage_set.all|first as product_image %}
-                                <img src="{{ product_image.image|thumbnail_url:'masonry' }}" alt="{{ product.title }}" />
-                            {% endwith %}
-                        {% endif %}
-                        <div class="masonry-item-title">{{ product.title }} <i class="fa fa-angle-double-right"></i>
+                        <img src="{{ product.get_first_image.image|thumbnail_url:'masonry' }}" alt="{{ product.title }}" />
+                        <div class="corner-top-right">
+                            {{ product.special_offer }}
+                        </div>
+                        <div class="masonry-item-title">
+                            {{ product.price }}€ <i class="fa fa-angle-double-right"></i>
                         </div>
                     </a>
                 </div>
 
                 <div class="masonry-item-description">
-                    {% if product.abstract %}
-                        {{ product.abstract|safe }}
-                    {% else %}
-                        {{ product.content|safe }}
-                    {% endif %}
-                    <a class="pull-right" href="{% productitem_url product.slug %}">Mehr...</a>
+                    <a href="{% productitem_url product.slug %}">{{ product.title|safe }}</a>
                 </div>
             </div>
         {% endfor %}

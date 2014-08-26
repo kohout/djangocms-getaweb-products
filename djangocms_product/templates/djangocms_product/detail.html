@@ -13,27 +13,39 @@
         <script src="{{ STATIC_URL }}js/lightbox.min.js"></script>
     {% endaddtoblock %}
 
-    <h1>{{ object.title }} {% if object.price %}<p class="bg-primary news-price">{{ object.price }}</p>{% endif %}</h1>
-    <small>{{ object.news_date }}</small>
-    <h4>{{ object.abstract|safe }}</h4>
-
-    <div>
-      {{ object.content|safe }}
-    </div>
-
-    {% if object.get_first_image != None %}
-        <div class="news-images">
-            {% for product_image in object.productimage_set.all %}
+    <div class="col-md-4">
+        <div style="position: relative; overflow: hidden;">
+            <a href="{{ MEDIA_URL }}{{ object.get_first_image.image }}" data-lightbox="{{ object.title }}">
+                <img src="{{ object.get_first_image.image|thumbnail_url:'normal' }}" alt="{{ object.title }}" />
+            </a>
+            <div class="corner-top-right">{{ object.special_offer }}</div>
+        </div>
+        <div class="more-images">
+            {% for product_image in object.get_more_images %}
                 <a href="{{ MEDIA_URL }}{{ product_image.image }}" data-lightbox="{{ object.title }}">
                     <img src="{{ product_image.image|thumbnail_url:'thumb' }}" alt="{{ object.title }}" />
                 </a>
             {% endfor %}
         </div>
-    {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h1>{{ object.title }} {% if object.price %}<p class="bg-primary header-price">{{ object.price }}</p>{% endif %}</h1>
+        <div>
+          {{ object.content|safe }}
+        </div>
 
+        {% if object.link %}
+            <a href="{{ object.link }}" target="_blank"><i class="fa fa-external-link"></i> Infos</a><br />
+        {% endif %}
+        {% if object.document %}
+            <a href="{{ MEDIA_URL }}{{ object.document }}" target="_blank"><i class="fa fa-file"></i> Download</a><br />
+        {% endif %}
+
+        <br />
+
+        {% for category in object.product_categories.all %}
+            <a href="{% productcategory_url category.pk %}">Zurück zur Produkt-Kategorie "{{ category.title }}"</a><br />
+        {% endfor %}
+    </div>
     <div class="clearfix"></div>
-
-    {% for category in object.product_categories.all %}
-        <a href="{% productcategory_url category.pk %}">Zurück zur Produkt-Kategorie "{{ category.title }}"</a><br />
-    {% endfor %}
 {% endblock %}
