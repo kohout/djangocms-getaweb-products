@@ -1,6 +1,39 @@
-<h1>{{ object.title }}</h1>
-<h2>{{ object.abstract }}</h2>
-<div>
-  {{ object.content }}
-</div>
-<ul>
+{% extends "layouts/default.html" %}
+
+{% load cmsproducts thumbnail sekizai_tags %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block whole_content %}
+    {% addtoblock "css" %}
+        <link href="{{ STATIC_URL }}css/lightbox.css" rel="stylesheet" />
+    {% endaddtoblock %}
+
+    {% addtoblock "js" %}
+        <script src="{{ STATIC_URL }}js/lightbox.min.js"></script>
+    {% endaddtoblock %}
+
+    <h1>{{ object.title }} {% if object.price %}<p class="bg-primary news-price">{{ object.price }}</p>{% endif %}</h1>
+    <small>{{ object.news_date }}</small>
+    <h4>{{ object.abstract|safe }}</h4>
+
+    <div>
+      {{ object.content|safe }}
+    </div>
+
+    {% if object.get_first_image != None %}
+        <div class="news-images">
+            {% for product_image in object.productimage_set.all %}
+                <a href="{{ MEDIA_URL }}{{ product_image.image }}" data-lightbox="{{ object.title }}">
+                    <img src="{{ product_image.image|thumbnail_url:'thumb' }}" alt="{{ object.title }}" />
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="clearfix"></div>
+
+    {% for category in object.product_categories.all %}
+        <a href="{% productcategory_url category.pk %}">Zurück zur Produkt-Kategorie "{{ category.title }}"</a><br />
+    {% endfor %}
+{% endblock %}

@@ -4,9 +4,18 @@ from django.utils.translation import ugettext_lazy as _
 from cms.menu_bases import CMSAttachMenu
 from .models import ProductCategory
 
-class ProductCategoryMenu(CMSAttachMenu):
 
+class ProductCategoryMenu(CMSAttachMenu):
     name = _('Product Category Menu')
+    current_page = None
+
+    def get_current_page(self, request):
+        if self.current_page:
+            return self.current_page
+        self.current_page = request.current_page
+        if self.current_page.publisher_is_draft:
+            self.current_page = self.current_page.publisher_public
+        return self.current_page
 
     def get_nodes(self, request):
         nodes = []
@@ -14,7 +23,8 @@ class ProductCategoryMenu(CMSAttachMenu):
             return nodes
 
         for category in ProductCategory.objects.filter(
-            productitem__target_page=request.current_page).distinct().order_by(
+            productitem__target_page=self.get_current_page(request)
+        ).distinct().order_by(
                 'title'):
             node = NavigationNode(
                 category.title,
@@ -23,6 +33,7 @@ class ProductCategoryMenu(CMSAttachMenu):
                 0,
             )
             nodes.append(node)
+        print nodes
         return nodes
 
 menu_pool.register_menu(ProductCategoryMenu)

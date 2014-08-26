@@ -1,0 +1,68 @@
+{% load i18n cmsproducts %}
+
+{% if page_obj %}
+{% with page_obj.paginator.count as total %}
+{% with page_obj.object_list|length as count %}
+{% with page_obj.paginator.per_page as per_page %}
+{% block pagination %}
+<div class="row">
+    <div class="col-sm-4">
+        <div class="pagination_info small">
+            {% block pagination.cardinality %}
+                {% trans "Displaying" %}
+                {% if total == 1 %}{{ table.data.verbose_name }}{% else %}{{ table.data.verbose_name_plural }}{% endif %}
+                {{ page_obj.start_index }}
+                {% trans "through" %}
+                {{ page_obj.end_index }}. <br />
+                {% trans "Total: " %} {{ total }}
+                {% if total == 1 %}{{ table.data.verbose_name }}{% else %}{{ table.data.verbose_name_plural }}{% endif %}
+            {% endblock pagination.cardinality %}
+        </div>
+    </div>
+    <div class="col-sm-8">
+        {% if total > per_page %}
+        <div class="paging_bootstrap">
+            <ul class="pagination pull-right">
+                {% if page_obj.has_previous %}
+                    <li class="prev"><a href="{% page_pagination request.GET.category 1 %}">{% trans "First" %}</a></li>
+                    {% block pagination.previous %}<li><a href="{% page_pagination request.GET.category page_obj.previous_page_number %}">{% trans "Previous" %}</a></li>{% endblock pagination.previous %}
+                {% else %}
+                    <li class="prev disabled"><a href="">{% trans "First" %}</a></li>
+                    <li class="disabled"><a href="">{% trans "Previous" %}</a></li>
+                {% endif %}
+
+                {% if page_obj.number > 3 %}
+                    <li class="disabled"><a href="">...</a></li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                        {% ifequal i page_obj.number %}
+                            <li class="active"><a href="">{{ i }}</a></li>
+                        {% else %}
+                            <li><a href="{% page_pagination request.GET.category i %}">{{ i }}</a></li>
+                        {% endifequal %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                    <li class="disabled"><a href="">...</a></li>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    {% block pagination.next %}<li><a href="{% page_pagination request.GET.category page_obj.next_page_number %}">{% trans "Next" %}</a></li>{% endblock pagination.next %}
+                    <li class="next"><a href="{% page_pagination request.GET.category page_obj.paginator.num_pages %}">{% trans "Last" %}</a></li>
+                {% else %}
+                    <li class="disabled"><a href="">{% trans "Next" %}</a></li>
+                    <li class="next disabled"><a href="">{% trans "Last" %}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock pagination %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endif %}

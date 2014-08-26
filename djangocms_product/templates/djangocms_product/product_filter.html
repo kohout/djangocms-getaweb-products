@@ -7,7 +7,7 @@
      class="list-group-item {{ filter_tag }}-{{ cat.item.pk }} {% if cat.item.pk|stringformat:"s" in filter_categories or show_all %}active{% endif %}">
      <i class="fa {% if cat.item.pk|stringformat:"s" in filter_categories or show_all %}fa-check-square-o{% else %}fa-square-o{% endif %} fa-fw"></i>
      <span>&nbsp; {{ cat.item.title }}</span>
-     <span class="badge">{{ cat.newsitems_count }}</span>
+     <span class="badge">{{ cat.item.productitems_count }}</span>
   </a>
 {% endfor %}
 

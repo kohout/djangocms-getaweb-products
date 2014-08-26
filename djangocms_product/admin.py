@@ -5,10 +5,12 @@ from django.utils.translation import ugettext as _
 from .models import ProductCategory, ProductItem, ProductImage
 from .forms import ProductItemForm
 
+
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'productitems_count', )
     search_fields = ('title', )
     prepopulated_fields = {'slug': ('title',)}
+
 
 class ProductImageInline(SortableInlineAdminMixin,
 			 admin.TabularInline):
@@ -27,6 +29,7 @@ class ProductImageInline(SortableInlineAdminMixin,
 
     render_preview.allow_tags = True
     render_preview.short_description = _(u'Preview')
+
 
 class ProductItemAdmin(admin.ModelAdmin):
     form = ProductItemForm

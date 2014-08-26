@@ -2,7 +2,9 @@
 from django.db.models import Q
 from django.core.urlresolvers import resolve
 from django.views.generic import ListView, DetailView
+from djangocms_product.filters import ProductItemFilter
 from .models import ProductItem, ProductCategory
+
 
 class ProductMixin(object):
     current_category = 0
@@ -19,15 +21,6 @@ class ProductMixin(object):
     def get_queryset(self):
         q = ProductItem.objects.filter(active=True)
         q = q.filter(target_page=self.get_current_page())
-
-        # TODO: does not work -> frontend renders strange urls:
-        # http://localhost:8000/shop/category/5/?/shop/category/5/=/shop/category/5/
-        # The news module seems to be a newer version which works:
-        # /news/?category=5,4,3,2,....
-        #self.current_category = int(self.kwargs.get('category', 0))
-        #if self.current_category > 0:
-        #    q = q.filter(product_categories__in=[self.current_category])
-        print q.query
         return q
 
     def get_product_categories(self):
@@ -43,6 +36,8 @@ class ProductMixin(object):
     def get_context_data(self, *args, **kwargs):
         ctx = super(ProductMixin, self).get_context_data(*args, **kwargs)
         ctx['categories'] = self.get_product_categories()
+        if 'category' in self.kwargs:
+            ctx['category'] = self.kwargs['category']
         return ctx
 
 
@@ -52,6 +47,22 @@ class ProductListView(ProductMixin, ListView):
     """
     model = ProductItem
     template_name = 'djangocms_product/list.html'
+    paginate_by = 25
+    filter_class = ProductItemFilter
+
+    def get_queryset(self):
+        q = super(ProductListView, self).get_queryset()
+        return self.filter_class(self.request.GET, q)
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super(ProductListView, self).get_context_data(*args, **kwargs)
+        if self.request.GET.get('category'):
+            filter_categories = self.request.GET.get('category')
+            filter_categories = filter_categories.split(',')
+            ctx['filter_categories'] = filter_categories
+        else:
+            ctx['show_all'] = True
+        return ctx
 
 
 class ProductDetailView(ProductMixin, DetailView):

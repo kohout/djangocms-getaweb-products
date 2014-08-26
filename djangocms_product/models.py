@@ -12,6 +12,7 @@ from tinymce.models import HTMLField
 from decimal import Decimal
 import datetime
 
+
 class ProductCategory(models.Model):
     title = models.CharField(
         max_length=150,
@@ -29,7 +30,9 @@ class ProductCategory(models.Model):
     productitems_count.short_description = _(u'Count of active product items')
 
     def get_absolute_url(self):
-        return reverse('product-detail', kwargs={'category': self.slug})
+        view_name = '%s-product:product-index' % (
+            settings.SITE_PREFIX, )
+        return "%s?category=%s" % (reverse(view_name), self.pk)
 
     def __unicode__(self):
         return self.title
