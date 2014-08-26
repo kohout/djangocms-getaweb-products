@@ -18,7 +18,9 @@
             <a href="{{ MEDIA_URL }}{{ object.get_first_image.image }}" data-lightbox="{{ object.title }}">
                 <img src="{{ object.get_first_image.image|thumbnail_url:'normal' }}" alt="{{ object.title }}" />
             </a>
-            <div class="corner-top-right">{{ object.special_offer }}</div>
+            {% if object.special_offer %}
+              <div class="corner-top-right">{{ object.special_offer }}</div>
+            {% endif %}
         </div>
         <div class="more-images">
             {% for product_image in object.get_more_images %}
