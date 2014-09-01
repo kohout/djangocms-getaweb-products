@@ -4,15 +4,18 @@
 <div class="list-group filter-group">
 {% for cat in categories %}
   <a href="{% productcategory_url cat.item.pk %}"
-     class="list-group-item {{ filter_tag }}-{{ cat.item.pk }} {% if cat.item.pk|stringformat:"s" in filter_categories or show_all %}active{% endif %}">
-     <i class="fa {% if cat.item.pk|stringformat:"s" in filter_categories or show_all %}fa-check-square-o{% else %}fa-square-o{% endif %} fa-fw"></i>
+     class="list-group-item {% if cat.item.pk|stringformat:"s" in filter_categories %}active{% endif %}">
+     <i class="fa {% if cat.item.pk|stringformat:"s" in filter_categories %}fa-check-square-o{% else %}fa-square-o{% endif %} fa-fw"></i>
      <span>&nbsp; {{ cat.item.title }}</span>
      <span class="badge">{{ cat.item.productitems_count }}</span>
   </a>
 {% endfor %}
 
-
-
+{% comment %}
 <a href="{% productindex_url %}" class="filter-all btn btn-secondary"><i class="fa fa-check-square-o fa-fw"></i>Alle</a>
 <a href="{% productindex_url %}" class="filter-none btn btn-secondary"><i class="fa fa-square-o fa-fw"></i>Keine</a>
+{% endcomment %}
 </div>
+
+<a href="{% productindex_url %}" class="filter-none btn btn-secondary btn-block"
+        style="{% if filter_categories %}display: block;{% endif %}">Filter aufheben</a>
