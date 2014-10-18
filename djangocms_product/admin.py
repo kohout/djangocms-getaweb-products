@@ -2,14 +2,45 @@
 from adminsortable.admin import SortableInlineAdminMixin
 from django.contrib import admin
 from django.utils.translation import ugettext as _
-from .models import ProductCategory, ProductItem, ProductImage
+from .models import (ProductCategory, ProductItem, ProductImage,
+    Order, OrderedItem)
 from .forms import ProductItemForm
+from django.conf import settings
 
 
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'productitems_count', )
     search_fields = ('title', )
     prepopulated_fields = {'slug': ('title',)}
+
+
+class OrderedItemInline(admin.TabularInline):
+    fields = ('amount', 'product_item', )
+    readonly_fields = ('amount', 'product_item', )
+    model = OrderedItem
+    extra = 0
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj):
+        return False
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'first_name', 'last_name',
+        'zipcode', 'city')
+    list_display_links = ('created_at', 'first_name', 'last_name',
+        'zipcode', 'city')
+    readonly_fields = (
+        'first_name',
+        'last_name',
+        'zipcode',
+        'city',
+        'address',
+        'email',
+        'telephone',
+    )
+    inlines = [OrderedItemInline]
 
 
 class ProductImageInline(SortableInlineAdminMixin,
@@ -92,3 +123,6 @@ class ProductItemAdmin(admin.ModelAdmin):
 
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(ProductItem, ProductItemAdmin)
+
+if getattr(settings, 'DJANGOCMS_PRODUCT_SIMPLEORDER', False):
+    admin.site.register(Order, OrderAdmin)

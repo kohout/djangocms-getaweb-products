@@ -12,11 +12,19 @@ from tinymce.models import HTMLField
 from decimal import Decimal
 import datetime
 
-
 class ProductCategory(models.Model):
     title = models.CharField(
         max_length=150,
         verbose_name=_(u'Title'))
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_(u'Order'))
+
+    section = models.CharField(
+        max_length=50,
+        blank=True, default=u'',
+        verbose_name=_(u'Section'))
 
     slug = models.SlugField(
         max_length=255,
@@ -254,3 +262,33 @@ class ProductImage(models.Model):
         ordering = ['ordering']
         verbose_name = _(u'Product Image')
         verbose_name_plural = _(u'Product Images')
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True,
+        verbose_name=_(u'Erstellt am'))
+    first_name = models.CharField(max_length=50,
+        verbose_name=_(u'Vorname'))
+    last_name = models.CharField(max_length=50,
+        verbose_name=_(u'Nachname'))
+    address = models.CharField(max_length=150,
+        verbose_name=_(u'Adresse'))
+    zipcode = models.CharField(max_length=5,
+        verbose_name=_(u'PLZ'))
+    city = models.CharField(max_length=50,
+        verbose_name=_(u'Ort'))
+    telephone = models.CharField(max_length=50,
+        verbose_name=_(u'Telefon'))
+    email = models.EmailField(max_length=150,
+        verbose_name=_(u'Email'))
+
+    class Meta:
+        verbose_name = _(u'Bestellung')
+        verbose_name_plural = _(u'Bestellungen')
+
+class OrderedItem(models.Model):
+    order = models.ForeignKey(Order,
+        verbose_name=_(u'Bestellung'))
+    product_item = models.ForeignKey(ProductItem,
+        verbose_name=_(u'Bestelltes Produkt'))
+    amount = models.PositiveIntegerField(default=0,
+        verbose_name=_(u'Menge'))

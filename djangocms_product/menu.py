@@ -33,7 +33,6 @@ class ProductCategoryMenu(CMSAttachMenu):
                 0,
             )
             nodes.append(node)
-        print nodes
         return nodes
 
 menu_pool.register_menu(ProductCategoryMenu)
