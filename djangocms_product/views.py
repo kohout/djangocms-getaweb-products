@@ -4,6 +4,8 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import resolve, reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.context import Context
+from django.template.loader import get_template
 from django.views.generic import View, ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
@@ -28,6 +30,7 @@ class SimpleOrderView(CreateView):
 
         # 2. save basket
         basket = self.get_basket()
+        total_amount = 0
         for key in basket.keys():
             print "KEY", key
             try:
@@ -40,6 +43,7 @@ class SimpleOrderView(CreateView):
                 oi.order = self.object
                 oi.amount = amount
                 oi.product_item = ProductItem.objects.get(pk=int(key))
+                total_amount += oi.product_item.price * oi.amount
                 print "order_id", oi.order
                 print "product_item_id", oi.product_item.pk
                 oi.save()
@@ -56,6 +60,26 @@ class SimpleOrderView(CreateView):
             ),
             'schullerwein@getaweb.at',
             ['ck@getaweb.at'], fail_silently=False)
+
+        # 5. send email to buyer
+        send_mail(
+            'schullerwein.at - Danke für Ihre Bestellung!',
+            get_template('djangocms_product/email.html').render(
+                Context({
+                    'first_name': self.object.first_name,
+                    'last_name': self.object.last_name,
+                    'address': self.object.address,
+                    'zipcode': self.object.zipcode,
+                    'city': self.object.city,
+                    'telephone': self.object.telephone,
+                    'products': OrderedItem.objects.filter(order=self.object),
+                    'total_amount': total_amount
+                })
+            ),
+            self.object.email,
+            ['schullerwein@getaweb.at'],
+            fail_silently=False
+        )
 
         return super(SimpleOrderView, self).form_valid(form)
 
