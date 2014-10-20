@@ -76,8 +76,8 @@ class SimpleOrderView(CreateView):
                     'total_amount': total_amount
                 })
             ),
-            self.object.email,
-            ['schullerwein@getaweb.at'],
+            'schullerwein@getaweb.at',
+            [self.object.email],
             fail_silently=False
         )
 
