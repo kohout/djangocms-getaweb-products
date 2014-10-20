@@ -62,25 +62,28 @@ class SimpleOrderView(CreateView):
             ['ck@getaweb.at'], fail_silently=False)
 
         # 5. send email to buyer
-	ctx = Context({
-	    'first_name': self.object.first_name,
-	    'last_name': self.object.last_name,
-	    'address': self.object.address,
-	    'zipcode': self.object.zipcode,
-	    'city': self.object.city,
-	    'telephone': self.object.telephone,
-	    'products': OrderedItem.objects.filter(order=self.object),
-	    'total_amount': total_amount
-	})
-        send_mail(
-            'schullerwein.at - Danke für Ihre Bestellung!',
-            get_template('djangocms_product/email.txt').render(ctx),
-            'schullerwein@getaweb.at',
-            [self.object.email],
-            fail_silently=False,
-            html_message=get_template(
-                'djangocms_product/email.html').render(ctx)
-        )
+        ctx = Context({
+            'first_name': self.object.first_name,
+            'last_name': self.object.last_name,
+            'address': self.object.address,
+            'zipcode': self.object.zipcode,
+            'city': self.object.city,
+            'telephone': self.object.telephone,
+            'products': OrderedItem.objects.filter(order=self.object),
+            'total_amount': total_amount
+        })
+        from django.core.mail import EmailMultiAlternatives
+
+        subject = 'schullerwein.at - Danke für Ihre Bestellung!'
+        from_email = 'schullerwein@getaweb.at'
+        to = self.object.email
+
+        text_content = get_template('djangocms_product/email.txt').render(ctx)
+        html_content = get_template('djangocms_product/email.html').render(ctx)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return super(SimpleOrderView, self).form_valid(form)
 
