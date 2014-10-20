@@ -62,23 +62,24 @@ class SimpleOrderView(CreateView):
             ['ck@getaweb.at'], fail_silently=False)
 
         # 5. send email to buyer
+	ctx = Context({
+	    'first_name': self.object.first_name,
+	    'last_name': self.object.last_name,
+	    'address': self.object.address,
+	    'zipcode': self.object.zipcode,
+	    'city': self.object.city,
+	    'telephone': self.object.telephone,
+	    'products': OrderedItem.objects.filter(order=self.object),
+	    'total_amount': total_amount
+	})
         send_mail(
             'schullerwein.at - Danke für Ihre Bestellung!',
-            get_template('djangocms_product/email.html').render(
-                Context({
-                    'first_name': self.object.first_name,
-                    'last_name': self.object.last_name,
-                    'address': self.object.address,
-                    'zipcode': self.object.zipcode,
-                    'city': self.object.city,
-                    'telephone': self.object.telephone,
-                    'products': OrderedItem.objects.filter(order=self.object),
-                    'total_amount': total_amount
-                })
-            ),
+            get_template('djangocms_product/email.txt').render(ctx),
             'schullerwein@getaweb.at',
             [self.object.email],
-            fail_silently=False
+            fail_silently=False,
+            html_message=get_template(
+                'djangocms_product/email.html').render(ctx)
         )
 
         return super(SimpleOrderView, self).form_valid(form)
