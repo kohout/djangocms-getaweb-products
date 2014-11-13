@@ -63,6 +63,12 @@ class ProductImageInline(SortableInlineAdminMixin,
 
 
 class ProductItemAdmin(admin.ModelAdmin):
+
+    #def get_form(self, request, obj=None, **kwargs):
+    #    form = super(ProductItemAdmin, self.get_form(request, obj, **kwargs)
+    #    #form.base_fields['content'].widget.attrs['style'] = 'width: 500px;'
+    #    return form
+
     form = ProductItemForm
     list_display = ('render_preview',
 		    'title',
@@ -78,15 +84,13 @@ class ProductItemAdmin(admin.ModelAdmin):
         (_(u'Common'), {
             'fields': (
                 ('active', ),
+		('title', 'slug', ),
                 ('price', 'special_offer', ),
                 ('product_categories', 'target_page'),
             )
         }),
         (_(u'Content'), {
-            'fields': (
-		('title', 'slug', ),
-		('content', ),
-            ),
+            'fields': ('content',),
         }),
         (_(u'External Content'), {
             'fields': (
