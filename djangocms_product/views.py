@@ -11,9 +11,26 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from djangocms_product.filters import ProductItemFilter
 from .models import ProductItem, ProductCategory, Order, OrderedItem
+from .forms import OrderForm
 import json
 from decimal import Decimal as D
 
+def my_import(name):
+    components = name.split('.')
+    method = components.pop()
+    mod = __import__('.'.join(components))
+    return getattr(mod, method)
+
+def get_shipping(basket, products, total_amount):
+    shipping = {}
+    try:
+        from settings import DJANGOCMS_PRODUCT_SHIPPING
+        for shipping_method_string in DJANGOCMS_PRODUCT_SHIPPING:
+            shipping_method = my_import(shipping_method_string)
+            shipping.update(shipping_method(basket, products, total_amount))
+    except ImportError:
+        pass
+    return shipping
 
 class SimpleOrderSuccessView(TemplateView):
     template_name = 'djangocms_product/order_success.html'
@@ -21,6 +38,7 @@ class SimpleOrderSuccessView(TemplateView):
 
 class SimpleOrderView(CreateView):
     model = Order
+    form_class = OrderForm
 
     def get_basket(self):
         return self.request.session.get('basket', {})
@@ -31,6 +49,7 @@ class SimpleOrderView(CreateView):
         # 2. save basket
         basket = self.get_basket()
         total_amount = 0
+        products = []
         for key in basket.keys():
             print "KEY", key
             try:
@@ -43,15 +62,26 @@ class SimpleOrderView(CreateView):
                 oi.order = self.object
                 oi.amount = amount
                 oi.product_item = ProductItem.objects.get(pk=int(key))
+                products.append(oi.product_item)
                 total_amount += oi.product_item.price * oi.amount
                 print "order_id", oi.order
                 print "product_item_id", oi.product_item.pk
                 oi.save()
 
-        # 3. reset basket
+        # 3. add cumulated info
+        self.object.total_amount = total_amount
+        shipping = get_shipping(basket, products, total_amount)
+        if shipping:
+            shipping = shipping.get(self.object.country, None)
+            if shipping:
+                self.object.shipping_amount = shipping['amount']
+                self.object.shipping_label = shipping['label']
+        self.object.save()
+
+        # 4. reset basket
         self.request.session['basket'] = {}
 
-        # 4. send notification mail
+        # 5. send notification mail
         send_mail('schullerwein.at - Neue Bestellung',
             'Es wurde eine neue Bestell-Anfrage erstellt:\nhttp://%s%s' % (
                 self.request.META['HTTP_HOST'],
@@ -63,14 +93,8 @@ class SimpleOrderView(CreateView):
 
         # 5. send email to buyer
         ctx = Context({
-            'first_name': self.object.first_name,
-            'last_name': self.object.last_name,
-            'address': self.object.address,
-            'zipcode': self.object.zipcode,
-            'city': self.object.city,
-            'telephone': self.object.telephone,
+            'object': self.object,
             'products': OrderedItem.objects.filter(order=self.object),
-            'total_amount': total_amount
         })
         from django.core.mail import EmailMultiAlternatives
 
@@ -112,6 +136,7 @@ class SimpleOrderView(CreateView):
                     'total': total,
                 })
         ctx['total_amount'] = total_amount
+        ctx['shipping'] = get_shipping(basket, products, total_amount)
         return ctx
 
 class BasketChangeMixin(object):

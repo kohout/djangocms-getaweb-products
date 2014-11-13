@@ -11,6 +11,10 @@ from easy_thumbnails.exceptions import InvalidImageFormatError
 from tinymce.models import HTMLField
 from decimal import Decimal
 import datetime
+from settings import (
+    DJANGOCMS_PRODUCT_COUNTRIES,
+    DJANGOCMS_PRODUCT_DEFAULT_COUNTRY,
+)
 
 class ProductCategory(models.Model):
     title = models.CharField(
@@ -276,10 +280,31 @@ class Order(models.Model):
         verbose_name=_(u'PLZ'))
     city = models.CharField(max_length=50,
         verbose_name=_(u'Ort'))
+    country = models.CharField(max_length=100,
+        default=DJANGOCMS_PRODUCT_DEFAULT_COUNTRY,
+        choices=DJANGOCMS_PRODUCT_COUNTRIES,
+        verbose_name=_(u'Land'))
     telephone = models.CharField(max_length=50,
         verbose_name=_(u'Telefon'))
     email = models.EmailField(max_length=150,
         verbose_name=_(u'Email'))
+    total_amount = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name=_(u'Gesamtbetrag'))
+    shipping_amount = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name=_(u'Versandkosten'))
+    shipping_label = models.CharField(max_length=150,
+        default=u'', blank=True,
+        verbose_name=_(u'Versand-Label'))
+
+    @property
+    def amount_with_shipping(self):
+        return self.total_amount + self.shipping_amount
 
     class Meta:
         verbose_name = _(u'Bestellung')

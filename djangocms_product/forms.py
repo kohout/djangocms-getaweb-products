@@ -1,6 +1,16 @@
 from django import forms
-from .models import ProductItem
+from .models import ProductItem, Order
 from cms.models.pagemodel import Page
+
+class OrderForm(forms.ModelForm):
+
+    class Meta:
+        model = Order
+        exclude = (
+            'total_amount',
+            'shipping_amount',
+            'shipping_label',
+        )
 
 class ProductItemForm(forms.ModelForm):
 
