@@ -51,12 +51,10 @@ class SimpleOrderView(CreateView):
         total_amount = 0
         products = []
         for key in basket.keys():
-            print "KEY", key
             try:
                 amount = basket[key]
             except KeyError:
                 amount = 0
-            print "AMOUNT", amount
             if amount > 0:
                 oi = OrderedItem()
                 oi.order = self.object
@@ -74,7 +72,7 @@ class SimpleOrderView(CreateView):
         if shipping:
             shipping = shipping.get(self.object.country, None)
             if shipping:
-                self.object.shipping_amount = shipping['amount']
+                self.object.shipping_amount = shipping['value']
                 self.object.shipping_label = shipping['label']
         self.object.save()
 
@@ -82,14 +80,15 @@ class SimpleOrderView(CreateView):
         self.request.session['basket'] = {}
 
         # 5. send notification mail
-        send_mail('schullerwein.at - Neue Bestellung',
-            'Es wurde eine neue Bestell-Anfrage erstellt:\nhttp://%s%s' % (
-                self.request.META['HTTP_HOST'],
-                reverse('admin:djangocms_product_order_change', args=[
-                    self.object.pk]),
-            ),
-            'schullerwein@getaweb.at',
-            ['ck@getaweb.at'], fail_silently=False)
+        for to in ['ck@getaweb.at']:
+            send_mail('schullerwein.at - Bestellbestätigung',
+                'Es wurde eine neue Bestell-Anfrage erstellt:\nhttp://%s%s' % (
+                    self.request.META['HTTP_HOST'],
+                    reverse('admin:djangocms_product_order_change', args=[
+                        self.object.pk]),
+                ),
+                'schullerwein@getaweb.at',
+                [to], fail_silently=False)
 
         # 5. send email to buyer
         ctx = Context({
