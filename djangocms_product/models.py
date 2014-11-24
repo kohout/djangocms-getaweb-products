@@ -36,8 +36,11 @@ class ProductCategory(models.Model):
         unique=True,
         verbose_name=_("slug"))
 
+    def active_productitems(self):
+        return self.productitem_set.filter(active=True)
+
     def productitems_count(self):
-        return self.productitem_set.filter(active=True).count()
+        return self.active_productitems().count()
 
     productitems_count.short_description = _(u'Count of active product items')
 
