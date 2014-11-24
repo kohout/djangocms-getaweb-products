@@ -11,10 +11,13 @@ from easy_thumbnails.exceptions import InvalidImageFormatError
 from tinymce.models import HTMLField
 from decimal import Decimal
 import datetime
-from settings import (
-    DJANGOCMS_PRODUCT_COUNTRIES,
-    DJANGOCMS_PRODUCT_DEFAULT_COUNTRY,
-)
+import settings
+
+DJANGOCMS_PRODUCT_DEFAULT_COUNTRY = getattr(settings,
+    'DJANGOCMS_PRODUCT_DEFAULT_COUNTRY', u'')
+
+DJANGOCMS_PRODUCT_COUNTRIES = getattr(settings,
+    'DJANGOCMS_PRODUCT_COUNTRIES', [])
 
 class ProductCategory(models.Model):
     title = models.CharField(
@@ -284,6 +287,7 @@ class Order(models.Model):
     city = models.CharField(max_length=50,
         verbose_name=_(u'Ort'))
     country = models.CharField(max_length=100,
+        blank=True,
         default=DJANGOCMS_PRODUCT_DEFAULT_COUNTRY,
         choices=DJANGOCMS_PRODUCT_COUNTRIES,
         verbose_name=_(u'Land'))
