@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.pagemodel import Page
 from django.conf import settings
@@ -38,6 +39,12 @@ class ProductCategory(models.Model):
         db_index=True,
         unique=True,
         verbose_name=_("slug"))
+
+    free_shipping = models.BooleanField(
+        default=False,
+        help_text=u'Für Produkte dieser Kategorie werden keine ' \
+            u'Versandkosten berechnet',
+        verbose_name=u'Versandkostenfrei')
 
     def productitems_count(self):
         return self.productitem_set.filter(active=True).count()
@@ -114,6 +121,10 @@ class ProductItem(models.Model):
         blank=True, null=True,
         help_text=_(u'Link to more detailed page'),
         verbose_name=_(u'URL'))
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_(u'Order'))
 
     def get_first_image(self):
         images = self.productimage_set.all()
