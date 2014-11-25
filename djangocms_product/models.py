@@ -129,6 +129,10 @@ class ProductItem(models.Model):
         default=0,
         verbose_name=_(u'Order'))
 
+    out_of_stock = models.BooleanField(
+        default=False,
+        verbose_name=u'ausverkauft')
+
     def get_first_image(self):
         images = self.productimage_set.all()
         if images.count() == 0:

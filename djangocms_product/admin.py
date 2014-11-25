@@ -83,8 +83,8 @@ class ProductItemAdmin(admin.ModelAdmin):
     fieldsets = (
         (_(u'Common'), {
             'fields': (
-                ('active', 'order', ),
-		('title', 'slug', ),
+                ('active', 'out_of_stock', 'order', ),
+                ('title', 'slug', ),
                 ('price', 'special_offer', ),
                 ('product_categories', 'target_page'),
             )
