@@ -24,10 +24,12 @@
         {% for product in object_list %}
             <div class="masonry-item one-third">
                 <div class="masonry-item-image">
-                    <a href="{% productitem_url product.slug %}">
-                        <img src="{{ product.get_first_image.image|thumbnail_url:'masonry' }}" alt="{{ product.title }}" />
+                    <a href="{{ product.get_absolute_url }}">
+                        <img src="{{ product.get_first_image.image|thumbnail_url:'masonry' }}"
+                             alt="{{ product.title }}" />
                         <div class="corner-top-right">
-                            {{ product.special_offer }}
+                          <div class="corner-top-right-triangle"></div>
+                          <div class="corner-top-right-text">{{ product.special_offer }}</div>
                         </div>
                         <div class="masonry-item-title">
                             {{ product.price }}€ <i class="fa fa-angle-double-right"></i>
@@ -36,7 +38,7 @@
                 </div>
 
                 <div class="masonry-item-description">
-                    <a href="{% productitem_url product.slug %}">{{ product.title|safe }}</a>
+                    <a href="{{ product.get_absolute_url }}">{{ product.title|safe }}</a>
                 </div>
             </div>
         {% endfor %}

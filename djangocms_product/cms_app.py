@@ -7,7 +7,7 @@ from .menu import ProductCategoryMenu
 class ProductApp(CMSApp):
     name = _('Product Module')
     urls = ['djangocms_product.urls']
-    app_name = 'khw-product'
+    app_name = 'cms-product'
     #menus = [ProductCategoryMenu]
 
 apphook_pool.register(ProductApp)

@@ -211,13 +211,14 @@ class ProductMixin(object):
         product_categories = ProductCategory.objects.filter(
             productitem__target_page=self.get_current_page()
         ).distinct().order_by('section', 'order', 'title')
-        return [{
-            'item': n,
-            'count': n.productitem_set.count(),
-            'selected': n.id == self.current_category,
-            'order': n.order,
-            'section': n.section,
-        } for n in product_categories]
+        return product_categories
+        #return [{
+        #    'item': n,
+        #    'count': n.productitem_set.count(),
+        #    'selected': n.id == self.current_category,
+        #    'order': n.order,
+        #    'section': n.section,
+        #} for n in product_categories]
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(ProductMixin, self).get_context_data(*args, **kwargs)

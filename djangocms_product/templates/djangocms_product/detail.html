@@ -4,6 +4,11 @@
 
 {% block title %}{{ object.title }}{% endblock %}
 
+{% block breadcrumb %}
+  {{ block.super }}
+  <li>{{ object.title }}</li>
+{% endblock %}
+
 {% block whole_content %}
     {% addtoblock "css" %}
         <link href="{{ STATIC_URL }}css/lightbox.css" rel="stylesheet" />
@@ -14,9 +19,9 @@
     {% endaddtoblock %}
 
     <div class="col-md-4">
-        <div style="position: relative; overflow: hidden;">
+        <div>
             <a href="{{ MEDIA_URL }}{{ object.get_first_image.image }}" data-lightbox="{{ object.title }}">
-                <img src="{{ object.get_first_image.image|thumbnail_url:'normal' }}" alt="{{ object.title }}" />
+                <img src="{% thumbnail object.get_first_image.image 420x820 %}" alt="{{ object.title }}" />
             </a>
             {% if object.special_offer %}
               <div class="corner-top-right">{{ object.special_offer }}</div>
@@ -25,29 +30,58 @@
         <div class="more-images">
             {% for product_image in object.get_more_images %}
                 <a href="{{ MEDIA_URL }}{{ product_image.image }}" data-lightbox="{{ object.title }}">
-                    <img src="{{ product_image.image|thumbnail_url:'thumb' }}" alt="{{ object.title }}" />
+                    <img src="{% thumbnail object.get_first_image.image 120x120 upscale %}" alt="{{ object.title }}" />
                 </a>
             {% endfor %}
         </div>
     </div>
     <div class="col-md-8">
-        <h1>{{ object.title }} {% if object.price %}<p class="bg-primary header-price">{{ object.price }}</p>{% endif %}</h1>
+        <h1>
+          {{ object.title }}
+          {% if object.price %}
+            <p class="bg-primary header-price">{{ object.price }}€</p>
+          {% endif %}
+        </h1>
         <div>
           {{ object.content|safe }}
         </div>
 
         {% if object.link %}
-            <a href="{{ object.link }}" target="_blank"><i class="fa fa-external-link"></i> Infos</a><br />
+            <p><a href="{{ object.link }}" target="_blank">
+              <i class="fa fa-external-link"></i> Infos
+            </a></p>
         {% endif %}
         {% if object.document %}
-            <a href="{{ MEDIA_URL }}{{ object.document }}" target="_blank"><i class="fa fa-file"></i> Download</a><br />
+            <p><a href="{{ MEDIA_URL }}{{ object.document }}" target="_blank">
+              <i class="fa fa-file"></i> Download
+            </a></p>
         {% endif %}
 
-        <br />
-
-        {% for category in object.product_categories.all %}
-            <a href="{% productcategory_url category.pk %}">Zurück zur Produkt-Kategorie "{{ category.title }}"</a><br />
-        {% endfor %}
+        <p>
+          {% for category in object.product_categories.all %}
+                <a href="{{ category.get_absolute_url }}">Zurück zur Produkt-Kategorie "{{ category.title }}"</a><br />
+          {% endfor %}
+        </p>
     </div>
+
     <div class="clearfix"></div>
+
+    <hr>
+
+    {% if next %}
+      <a href="{{ next.get_absolute_url }}"
+         class="pull-right btn btn-secondary btn-lg"
+         title="{{ next.name }}">
+        Weiter
+        <i class="fa fa-angle-double-right"></i>
+      </a>
+    {% endif %}
+    {% if previous %}
+      <a href="{{ previous.get_absolute_url }}"
+         class="btn btn-secondary btn-lg"
+         title="{{ previous.name }}">
+        <i class="fa fa-angle-double-left"></i>
+        Zurück
+      </a>
+    {% endif %}
 {% endblock %}

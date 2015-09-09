@@ -147,8 +147,7 @@ class ProductItem(models.Model):
         return self.productimage_set.count() > 1
 
     def get_absolute_url(self):
-        view_name = '%s:product-detail' % (
-            self.target_page.application_namespace, )
+        view_name = 'cms-product:product-detail'
         return reverse(view_name, kwargs={'slug': self.slug})
 
     def __unicode__(self):

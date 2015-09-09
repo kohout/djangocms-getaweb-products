@@ -2,20 +2,20 @@
 
 <h1>Filter</h1>
 <div class="list-group filter-group">
-{% for cat in categories %}
-  <a href="{% productcategory_url cat.item.pk %}"
-     class="list-group-item {% if cat.item.pk|stringformat:"s" in filter_categories %}active{% endif %}">
-     <i class="fa {% if cat.item.pk|stringformat:"s" in filter_categories %}fa-check-square-o{% else %}fa-square-o{% endif %} fa-fw"></i>
-     <span>&nbsp; {{ cat.item.title }}</span>
-     <span class="badge">{{ cat.item.productitems_count }}</span>
-  </a>
-{% endfor %}
+  {% for cat in categories %}
+    <a href="{{ cat.get_absolute_url }}"
+       class="list-group-item {% if cat.pk|stringformat:"s" in filter_categories %}active{% endif %}">
+       <i class="fa {% if cat.pk|stringformat:"s" in filter_categories %}fa-check-square-o{% else %}fa-square-o{% endif %} fa-fw"></i>
+       <span>&nbsp; {{ cat.title }}</span>
+       <span class="badge">{{ cat.productitems_count }}</span>
+    </a>
+  {% endfor %}
 
-{% comment %}
-<a href="{% productindex_url %}" class="filter-all btn btn-secondary"><i class="fa fa-check-square-o fa-fw"></i>Alle</a>
-<a href="{% productindex_url %}" class="filter-none btn btn-secondary"><i class="fa fa-square-o fa-fw"></i>Keine</a>
-{% endcomment %}
+  {% comment %}
+  <a href="{% productindex_url %}" class="filter-all btn btn-secondary"><i class="fa fa-check-square-o fa-fw"></i>Alle</a>
+  <a href="{% productindex_url %}" class="filter-none btn btn-secondary"><i class="fa fa-square-o fa-fw"></i>Keine</a>
+  {% endcomment %}
 </div>
 
-<a href="{% productindex_url %}" class="filter-none btn btn-secondary btn-block"
+<a href="{% url 'cms-product:product-index' %}" class="filter-none btn btn-secondary btn-block"
         style="{% if filter_categories %}display: block;{% endif %}">Filter aufheben</a>
