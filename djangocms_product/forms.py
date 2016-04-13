@@ -30,4 +30,5 @@ class ProductItemForm(forms.ModelForm):
 
     class Meta:
         model = ProductItem
+        exclude = ('id',)
 
