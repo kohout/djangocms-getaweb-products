@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='djangocms-getaweb-products',
     version='0.1',
-    packages=['djangocms_products'],
+    packages=['djangocms_product'],
     include_package_data=True,
     license='Unlicense',  # example license
     description='A products app for Django CMS 3.0',
